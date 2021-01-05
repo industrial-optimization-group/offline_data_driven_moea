@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "desdeo_emo_moead"
+version = "0.1.0"
+description = ""
+authors = ["AMz"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+numpy = "^1.19.4"
+pandas = "^1.1.5"
+matplotlib = "^3.3.3"
+plotly = "^4.14.1"
+sklearn = "^0.0"
+scipy = "^1.5.4"
+pygmo = "^2.16.0"
+optproblems = "^1.3"
+tqdm = "^4.54.1"
+diversipy = "^0.8"
+pyDOE = "^0.3.8"
+joblib = "^1.0.0"
+pylint = "^2.6.0"
+jupyter = "^1.0.0"
+statsmodels = "^0.12.1"
+seaborn = "^0.11.1"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
