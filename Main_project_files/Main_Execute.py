@@ -1,4 +1,4 @@
-from desdeo_problem.Problem import DataProblem
+from ..desdeo_problem.Problem import DataProblem
 from desdeo_problem.surrogatemodels.SurrogateModels import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import Matern
 

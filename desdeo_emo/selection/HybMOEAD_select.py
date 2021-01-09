@@ -52,7 +52,7 @@ class HybMOEAD_select(SelectionBase):
         offspring_population        = np.array([offspring_fx]*num_neighbors)
         offspring_uncertainty       = np.array([offspring_unc]*num_neighbors)
         ideal_point_matrix          = np.array([ideal_point]*num_neighbors)
-
+        n_samples = 1000
         # Performing Generic MOEA/D selection
         
         values_SF           = self._evaluate_SF(current_population, current_reference_vectors, ideal_point_matrix)
@@ -62,32 +62,41 @@ class HybMOEAD_select(SelectionBase):
         # and replace the ones which are outperformed by it.
         selection_generic = np.where(values_SF_offspring.reshape(-1,) < values_SF)[0]
         #print("Generic selction:",selection_generic)
+        
+        
         # Probabilistic MOEA/D selection
-
         pwrong_current = Probability_wrong(mean_values=current_population, stddev_values=current_uncertainty, n_samples=1000)
         pwrong_current.vect_sample_f()
 
         pwrong_offspring = Probability_wrong(mean_values=offspring_population.reshape(-1,pop.problem.n_of_objectives), stddev_values=offspring_uncertainty.reshape(-1,pop.problem.n_of_objectives), n_samples=1000)
         pwrong_offspring.vect_sample_f()
 
-        values_SF_dist           = self._evaluate_SF_dist(current_population, current_reference_vectors, ideal_point_matrix, pwrong_current)
+        values_SF_current_dist           = self._evaluate_SF_dist(current_population, current_reference_vectors, ideal_point_matrix, pwrong_current)
         values_SF_offspring_dist = self._evaluate_SF_dist(offspring_population, current_reference_vectors, ideal_point_matrix, pwrong_offspring)
 
         ##### KDE here and then compute probability
-        #np.asarray([values_SF_offspring])
-        #values_SF_offspring.reshape(20,1,1000)
-        #pwrong_offspring.compute_pdf(values_SF_offspring.reshape(20,1,1000))
+        pwrong_current.pdf_list = {}
+        pwrong_current.ecdf_list = {}
+        pwrong_offspring.pdf_list = {}
+        pwrong_offspring.ecdf_list = {}
+        values_SF_offspring_temp = np.asarray([values_SF_offspring_dist])
+        values_SF_current_temp = np.asarray([values_SF_current_dist])
+        pwrong_offspring.compute_pdf(values_SF_offspring_temp.reshape(num_neighbors,1,n_samples))
+        pwrong_current.compute_pdf(values_SF_current_temp.reshape(num_neighbors,1,n_samples))
         #pwrong_offspring.plt_density(values_SF_offspring.reshape(20,1,1000))
-
+        probabilities = np.zeros(num_neighbors)
+        for i in range(num_neighbors):
+            probabilities[i]=pwrong_current.compute_probability_wrong_PBI(pwrong_offspring, index=i)
         # Compare the offspring with the individuals in the neighborhood 
-        # and replace the ones which are outperformed by it. 
-        #selection = np.where(values_SF_offspring < values_SF)[0]
-
-        selection_probabilitic = np.where(np.mean(values_SF_offspring_dist, axis=1) < np.mean(values_SF_dist, axis=1))[0] 
+        # and replace the ones which are outperformed by it if P_{wrong}>0.5
+        selection_probabilitic = np.where(probabilities>0.5)[0]
         #print("Selection prob:", selection_probabilitic)   
-        #print(selection)
         selection = np.union1d(selection_generic,selection_probabilitic)
         #print("Overall selection:", selection)
+        # considering mean 
+        #selection_probabilitic_2 = np.where(np.mean(values_SF_offspring_dist, axis=1) < np.mean(values_SF_current_dist, axis=1))[0]
+        #selection_2 = np.union1d(selection_generic,selection_probabilitic_2)
+        #print("Overall selection 2:", selection_2)
         return current_neighborhood[selection]
 
 

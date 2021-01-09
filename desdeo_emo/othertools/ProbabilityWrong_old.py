@@ -13,6 +13,10 @@ from datetime import datetime
 
 warnings.filterwarnings("ignore")
 
+#rc('font',**{'family':'serif','serif':['Helvetica']})
+#rc('text', usetex=True)
+#plt.rcParams.update({'font.size': 13})
+
 rx = np.zeros((3,2,2))
 operator = 'PBI'
 
@@ -63,6 +67,7 @@ class Probability_wrong:
             else:
                 self.f_samples = np.vstack((self.f_samples, f_temp))
 
+
     def compute_pdf(self, samples=None, bw=None):
         if samples is None:
             samples = self.f_samples
@@ -97,6 +102,8 @@ class Probability_wrong:
             self.pdf_list[str(i)]=pdf_temp
             self.ecdf_list[str(i)]=ecdf_temp
 
+
+
     def pdf_predict(self, x, pdf1, mu_B=None):
         pdf_vals = None
         if mu_B is None:
@@ -105,6 +112,7 @@ class Probability_wrong:
             return np.exp(pdf1.score_samples(np.reshape(mu_B-x, (-1, 1))))
         pdf_vals[np.where(x < 0)] = 0
         return pdf_vals
+
 
     def find_cdf(self, pdf, mu_B, lb_B, ub_B, mu):
         pdf1 = pdf
@@ -190,6 +198,10 @@ class Probability_wrong:
         ub_B = self.upper_bound[i, k]
         lb_A = mu_A - 2.6 * sigma_A
         ub_A = mu_A + 2.6 * sigma_A
+        #lb_B = mu_B - 2.6 * sigma_B
+        #ub_B = mu_B + 2.6 * sigma_B
+        #lb_B = mu_B-2*sigma_B
+        #ub_B = mu_B + 2 * sigma_B
         if k<j:
             return -1
         elif j==k:
@@ -198,8 +210,28 @@ class Probability_wrong:
             return 0
         elif (mu_A-3*sigma_A > mu_B+3*sigma_B) and (mu_A > mu_B):
             return 1
+        #else:
+        #lb_B = -np.inf
+        #ub_B = np.inf
+        #print("PDFs:")
+        #print(i)
+        #print(j)
+        #print(k)
         prob_mult_vect = np.vectorize(self.prob_mult)
+        #prob_wrong = integrate.quad(prob_mult_vect, -np.inf, np.inf, args=(pdf_A, pdf_B, mu_B, lb_B, ub_B))
         prob_wrong = integrate.quad(prob_mult_vect, 0, np.inf, args=(pdf_A, cdf_B))
+        #prob_wrong = integrate.quad(self.prob_mult, 0, 1, args=(pdf_A, pdf_B, mu_B, lb_B, ub_B))
+        """
+        prob_wrong = integrate.quad(self.prob_mult,
+                                    self.lower_bound[i,j],
+        #                            #lb_A,
+                                    self.upper_bound[i,j],
+        #                            #ub_A,
+                                    args=(pdf_A, pdf_B, mu_B, lb_B, ub_B),
+                                    )
+        """
+        #print(mu_B)
+        #print(prob_wrong[0])
         return prob_wrong[0]
 
     def compute_probability_wrong_blaze(self, i, j, k):
@@ -225,6 +257,10 @@ class Probability_wrong:
 
         prob_wrong = integrate.quad(prob_mult_vect, 0, np.inf, args=(pdf_A, cdf_B))
         return prob_wrong[0]
+
+
+
+
 
     def compute_probability_wrong_superfast(self, i, j, k):
         lb_A = np.min(self.support_grids[i,j])
@@ -292,6 +328,16 @@ class Probability_wrong:
         dim2 = self.size_cols
         dim3 = self.size_cols
         self.rank_prob_wrong = np.zeros((dim1,dim2,dim3))
+        #input = ((self.pdf_list[str(i)][j],self.pdf_list[str(i)][k],self.mean_samples[i][k]) for i,j,k in
+        # itertools.combinations_with_replacement(range(dim3), 3) if i < dim1 and j < dim2)
+        """
+        input = ((self.pdf_list[str(i)][j], self.pdf_list[str(i)][k], self.mean_samples[i][k]) for i, j, k in
+                 itertools.product(range(dim1), range(dim2), range(dim3)))
+        results = p.map(self.fun_wrapper, input)
+        p.close()
+        p.join()
+        results = np.reshape(results, (dim1, dim2, dim3))
+        """
         input = ((i, j, k) for i, j, k in
                  itertools.product(range(dim1), range(dim2), range(dim3)))
         results = p.map(self.fun_wrapper2, input)
@@ -304,6 +350,10 @@ class Probability_wrong:
                 for k in range(dim3):
                     if k<j:
                         results[i,j,k]=1-results[i,k,j]
+        #print(results)
+
+
+        #print(results)
         self.rank_prob_wrong = np.sum(results, axis=2)-0.5
 
     def compute_rank_vectorized_apd(self, apd_list, indiv_index_list):
@@ -390,21 +440,24 @@ class Probability_wrong:
                 fig.savefig('./Plots/'+operator+'_dist_'+str(int(datetime.timestamp(datetime.now())*1000))+'.pdf')
                 #plt.show()
                 print('Plot!')
-    
-    
-    def compute_probability_wrong_PBI(self, pwrong_offspring, index):
-        pdf_A, mu_A, mu_B, sigma_A, sigma_B = \
-            self.pdf_list[str(index)][0], \
-            self.mean_samples[index][0], \
-            pwrong_offspring.mean_samples[index][0], \
-            self.sigma_samples[index][0], \
-            pwrong_offspring.sigma_samples[index][0]
-        cdf_B = pwrong_offspring.ecdf_list[str(index)][0]
 
-        if (mu_A+3*sigma_A < mu_B-3*sigma_B) and (mu_A < mu_B):
-            return 0
-        elif (mu_A-3*sigma_A > mu_B+3*sigma_B) and (mu_A > mu_B):
-            return 1
-        prob_mult_vect = np.vectorize(self.prob_mult)
-        prob_wrong = integrate.quad(prob_mult_vect, 0, np.inf, args=(pdf_A, cdf_B))
-        return prob_wrong[0]
+    def cdf_pdf_grids(self):
+        self.pdf_cdf= np.zeros((self.size_rows,self.size_cols,1024))
+        self.cdf_grids = np.zeros((self.size_rows,self.size_cols,1024))
+        self.pdf_grids = np.zeros((self.size_rows,self.size_cols,1024))
+        self.support_grids = np.zeros((self.size_rows,self.size_cols,1024))
+        for i in range(self.size_rows):
+            for j in range(self.size_cols):
+                dens = sm.nonparametric.KDEUnivariate(self.f_samples[i, j, :])
+                dens.fit()
+                self.cdf_grids[i,j,:] = dens.cdf
+                self.pdf_grids[i,j,:] = self.pdf_predict(dens.support, self.pdf_list[str(i)][j])
+                self.support_grids[i,j,:] = dens.support
+        #self.pdf_cdf[i,j,:] = self.pdf_grids[i, j,:] * self.cdf_grids[i, j,:]
+# %timeit self.compute_probability_wrong(self.pdf_list[str(0)][0],self.pdf_list[str(0)][0],self.mean_samples[0][0])
+# %timeit np.asarray(vect_prob([self.pdf_list[str(0)][0]]*self.num_objectives,self.pdf_list[str(0)][:],self.mean_samples[0][:]))
+
+    def pdf_ecdf(self):
+        for i in range(self.size_rows):
+            for j in range(self.size_cols):
+                self.ecdf_list

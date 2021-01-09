@@ -58,20 +58,17 @@ problems = ['P1']
 #problems = ['WELDED_BEAM'] #dims=4
 #problems = ['TRUSS2D'] #dims=3
 
-#modes = [1, 2, 3]  # 1 = Generic, 2 = Approach 1 , 3 = Approach 2, 7 = Approach_Prob
-#modes = [7]  # 1 = Generic, 2 = Approach 1 , 3 = Approach 2
-#modes = [12, 72]
-#modes = [82]
-modes = [12]
 
-#sampling = ['BETA', 'MVNORM']
+#modes = [1, 7, 8]  # 1 = Gen-RVEA, 7 = Prob-RVEA 1 , 8 = Hyb-RVEA
+#modes = [12, 72, 82] # 12 = Gen-MOEA/D, 72 = Prob-MOEA/D, 82 = Hyb-MOEA/D
+
+modes = [82]
+
+
 sampling = ['LHS']
-#sampling = ['BETA','OPTRAND','MVNORM']
-#sampling = ['OPTRAND']
 #sampling = ['MVNORM']
 #sampling = ['LHS', 'MVNORM']
 
-#emo_algorithm = ['RVEA','IBEA']
 emo_algorithm = ['RVEA']
 #emo_algorithm = ['IBEA']
 #emo_algorithm = ['NSGAIII']

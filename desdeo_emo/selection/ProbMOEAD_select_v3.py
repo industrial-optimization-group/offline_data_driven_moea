@@ -6,7 +6,7 @@ from desdeo_emo.othertools.ReferenceVectors import ReferenceVectors
 from desdeo_emo.othertools.ProbabilityWrong import Probability_wrong
 
 
-class ProbMOEAD_select(SelectionBase):
+class ProbMOEAD_select_v3(SelectionBase):
     """The MOEAD selection operator. 
 
     Parameters
@@ -62,6 +62,7 @@ class ProbMOEAD_select(SelectionBase):
         values_SF_current = self._evaluate_SF(current_population, current_reference_vectors, ideal_point_matrix, pwrong_current)
         values_SF_offspring = self._evaluate_SF(offspring_population, current_reference_vectors, ideal_point_matrix, pwrong_offspring)
 
+        """
         ##### KDE here and then compute probability
         pwrong_current.pdf_list = {}
         pwrong_current.ecdf_list = {}
@@ -78,10 +79,10 @@ class ProbMOEAD_select(SelectionBase):
         # Compare the offspring with the individuals in the neighborhood 
         # and replace the ones which are outperformed by it if P_{wrong}>0.5
         selection = np.where(probabilities>0.5)[0]
-
+        """
         # Considering mean
-        # selection2 = np.where(np.mean(values_SF_offspring, axis=1) < np.mean(values_SF_current, axis=1))[0]
-        # print(selection)
+        selection = np.where(np.mean(values_SF_offspring, axis=1) < np.mean(values_SF_current, axis=1))[0]
+        #print(selection)
 
         return current_neighborhood[selection]
 

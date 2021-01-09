@@ -57,7 +57,7 @@ class MOEAD_select(SelectionBase):
         # Compare the offspring with the individuals in the neighborhood 
         # and replace the ones which are outperformed by it.
         selection = np.where(values_SF_offspring.reshape(-1,) < values_SF)[0]
-        print("Generic selction:",selection)
+        #print("Generic selction:",selection)
         return current_neighborhood[selection]
 
 

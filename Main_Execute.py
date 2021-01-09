@@ -1,6 +1,6 @@
 from desdeo_problem.Problem import DataProblem
 from desdeo_problem.surrogatemodels.SurrogateModels import GaussianProcessRegressor
-from SurrogateKriging import SurrogateKriging
+from desdeo_problem.surrogatemodels.SurrogateKriging import SurrogateKriging
 
 
 from desdeo_problem.testproblems.TestProblems import test_problem_builder
@@ -10,7 +10,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from desdeo_emo.EAs.RVEA import RVEA
+from desdeo_emo.EAs.ProbRVEA import RVEA
+from desdeo_emo.EAs.ProbRVEA import ProbRVEAv1 as ProbRVEA
+from desdeo_emo.EAs.ProbRVEA import HybRVEA
 from desdeo_emo.EAs.ProbMOEAD import MOEA_D
 from desdeo_emo.EAs.ProbMOEAD import ProbMOEAD
 from desdeo_emo.EAs.ProbMOEAD import HybMOEAD
@@ -67,7 +69,7 @@ def read_dataset(problem_testbench, folder_data, problem_name, nobjs, nvars, sam
         y = prob.evaluate(x)[0]
     return x, y
 
-def optimize_surrogates1(problem):
+def optimize_surrogates_1(problem):
     print("Optimizing...")
     evolver_opt = RVEA(problem, use_surrogates=True, n_gen_per_iter=100, total_function_evaluations=max_func_evals)
     while evolver_opt.continue_evolution():
@@ -78,7 +80,29 @@ def optimize_surrogates1(problem):
     #print(front_true)
     return evolver_opt.population
 
-def optimize_surrogates12(problem):
+def optimize_surrogates_7(problem):
+    print("Optimizing...")
+    evolver_opt = ProbRVEA(problem, use_surrogates=True, n_gen_per_iter=100, total_function_evaluations=max_func_evals)
+    while evolver_opt.continue_evolution():
+        evolver_opt.iterate()
+        print("FE count:",evolver_opt._function_evaluation_count)
+    #front_true = evolver_opt.population.objectives
+    #evolver_opt.population.
+    #print(front_true)
+    return evolver_opt.population
+
+def optimize_surrogates_8(problem):
+    print("Optimizing...")
+    evolver_opt = HybRVEA(problem, use_surrogates=True, n_gen_per_iter=100, total_function_evaluations=max_func_evals)
+    while evolver_opt.continue_evolution():
+        evolver_opt.iterate()
+        print("FE count:",evolver_opt._function_evaluation_count)
+    #front_true = evolver_opt.population.objectives
+    #evolver_opt.population.
+    #print(front_true)
+    return evolver_opt.population
+
+def optimize_surrogates_12(problem):
     print("Optimizing...")
     evolver_opt = MOEA_D(problem, use_surrogates=True, n_gen_per_iter=100, total_function_evaluations=max_func_evals)
     while evolver_opt.continue_evolution():
@@ -117,9 +141,13 @@ def run_optimizer(problem_testbench, folder_data, problem_name, nobjs, nvars, sa
     surrogate_problem, time_taken = build_surrogates(problem_testbench,problem_name, nobjs, nvars, is_data, x, y)
     print(time_taken)
     if approach == 1:
-        population = optimize_surrogates1(surrogate_problem)
+        population = optimize_surrogates_1(surrogate_problem)
+    elif approach == 7:
+        population = optimize_surrogates_7(surrogate_problem)
+    elif approach == 8:
+        population = optimize_surrogates_8(surrogate_problem)
     elif approach == 12:
-        population = optimize_surrogates12(surrogate_problem)
+        population = optimize_surrogates_12(surrogate_problem)
     elif approach == 72:
         population = optimize_surrogates_72(surrogate_problem)
     elif approach == 82:
