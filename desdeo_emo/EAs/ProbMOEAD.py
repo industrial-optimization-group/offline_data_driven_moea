@@ -103,10 +103,10 @@ class MOEA_D(BaseDecompositionEA):
         self.n_neighbors = n_neighbors
         self.SF_type = SF_type
         self.n_parents = n_parents
-        self.population.mutation = BP_mutation(problem.get_variable_lower_bounds(), problem.get_variable_upper_bounds(), 0.5, 20)
-        self.population.recombination = SBX_xover(1.0, 20)
-        #self.population.mutation = BP_mutation(problem.get_variable_lower_bounds(), problem.get_variable_upper_bounds())
-        #self.population.recombination = SBX_xover()
+        #self.population.mutation = BP_mutation(problem.get_variable_lower_bounds(), problem.get_variable_upper_bounds(), 0.5, 20)
+        #self.population.recombination = SBX_xover(1.0, 20)
+        self.population.mutation = BP_mutation(problem.get_variable_lower_bounds(), problem.get_variable_upper_bounds())
+        self.population.recombination = SBX_xover()
         selection_operator = MOEAD_select(
             self.population, SF_type=SF_type
         )
