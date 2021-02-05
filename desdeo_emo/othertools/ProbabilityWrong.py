@@ -13,6 +13,10 @@ from datetime import datetime
 
 warnings.filterwarnings("ignore")
 
+rc('font',**{'family':'serif','serif':['Helvetica']})
+rc('text', usetex=True)
+plt.rcParams.update({'font.size': 15})
+
 rx = np.zeros((3,2,2))
 operator = 'PBI'
 
@@ -84,6 +88,8 @@ class Probability_wrong:
         print("Sigma:")
         print(self.sigma_samples)
         """
+        bw[bw <= 0.0] = 0.000000000000001
+
         for i in range(self.size_rows):
             pdf_temp = []
             ecdf_temp = []
@@ -363,11 +369,12 @@ class Probability_wrong:
             for j in range(self.size_cols):
                 #plt.rcParams["text.usetex"] = True
                 fig, ax = plt.subplots()
-                #fig.set_size_inches(5, 5)
+                fig.set_size_inches(4, 3.5)
                 y = self.pdf_predict(X_plot, self.pdf_list[str(i)][j])
                 y_2 = self.ecdf_list[str(i)][j](X_plot)
                 #print(i)
                 #print(j)
+                plt.xlim(1.5,4)
                 ax.set_xlabel(operator)
                 ax.set_ylabel('Probability density',color='r')
 
@@ -383,7 +390,8 @@ class Probability_wrong:
                 ax2.set_ylabel('Cumulative density',color='b')
                 ax.plot(X_plot, y_2, label='Empirical CDF of  '+operator,color='b')
                 ax2.tick_params(axis='y', labelcolor='b')
-                ax.legend()
+                #ax.legend()
+                #ax.legend(loc='lower left',bbox_to_anchor=(0,1),ncol=1, fancybox=True)
                 #ax2.legend()
                 fig.tight_layout()
 
@@ -400,11 +408,12 @@ class Probability_wrong:
             self.sigma_samples[index][0], \
             pwrong_offspring.sigma_samples[index][0]
         cdf_B = pwrong_offspring.ecdf_list[str(index)][0]
-
+        max_range = max(mu_A+3*sigma_A,mu_B+3*sigma_B)
         if (mu_A+3*sigma_A < mu_B-3*sigma_B) and (mu_A < mu_B):
             return 0
         elif (mu_A-3*sigma_A > mu_B+3*sigma_B) and (mu_A > mu_B):
             return 1
         prob_mult_vect = np.vectorize(self.prob_mult)
-        prob_wrong = integrate.quad(prob_mult_vect, 0, np.inf, args=(pdf_A, cdf_B))
+        #prob_wrong = integrate.quad(prob_mult_vect, 0, np.inf, args=(pdf_A, cdf_B))
+        prob_wrong = integrate.quad(prob_mult_vect, 0, max_range, args=(pdf_A, cdf_B))
         return prob_wrong[0]

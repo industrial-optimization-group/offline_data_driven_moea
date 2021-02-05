@@ -23,7 +23,7 @@ class MOEAD_select(SelectionBase):
 	 # initialize
         self.SF_type = SF_type
 
-    def do(self, pop: Population, vectors: ReferenceVectors, ideal_point, current_neighborhood, offspring_fx) -> List[int]:
+    def do(self, pop: Population, vectors: ReferenceVectors, ideal_point, current_neighborhood, offspring_fx, theta_adaptive) -> List[int]:
         """Select the individuals that are kept in the neighborhood.
 
         Parameters
@@ -50,9 +50,10 @@ class MOEAD_select(SelectionBase):
         current_reference_vectors   = vectors.values[current_neighborhood,:]
         offspring_population        = np.array([offspring_fx]*num_neighbors)
         ideal_point_matrix          = np.array([ideal_point]*num_neighbors)
+        theta_adaptive_matrix       = np.array([theta_adaptive]*num_neighbors)
 
-        values_SF           = self._evaluate_SF(current_population, current_reference_vectors, ideal_point_matrix)
-        values_SF_offspring = self._evaluate_SF(offspring_population.reshape(-1,pop.problem.n_of_objectives), current_reference_vectors, ideal_point_matrix)
+        values_SF           = self._evaluate_SF(current_population, current_reference_vectors, ideal_point_matrix, theta_adaptive_matrix)
+        values_SF_offspring = self._evaluate_SF(offspring_population.reshape(-1,pop.problem.n_of_objectives), current_reference_vectors, ideal_point_matrix, theta_adaptive_matrix)
 
         # Compare the offspring with the individuals in the neighborhood 
         # and replace the ones which are outperformed by it.
@@ -70,7 +71,7 @@ class MOEAD_select(SelectionBase):
         feval   = np.sum(objective_values * weights)
         return feval
 
-    def pbi(self, objective_values, weights, ideal_point, theta = 5):
+    def pbi(self, objective_values, weights, ideal_point, theta):
         norm_weights    = np.linalg.norm(weights)
         weights         = weights/norm_weights
         fx_a            = objective_values - ideal_point
@@ -83,12 +84,12 @@ class MOEAD_select(SelectionBase):
         return fvalue
 
 
-    def _evaluate_SF(self, neighborhood, weights, ideal_point):
+    def _evaluate_SF(self, neighborhood, weights, ideal_point, theta_adaptive):
         if self.SF_type == "TCH":
             SF_values = np.array(list(map(self.tchebycheff, neighborhood, weights, ideal_point)))
             return SF_values
         elif self.SF_type == "PBI":
-            SF_values = np.array(list(map(self.pbi, neighborhood, weights, ideal_point)))
+            SF_values = np.array(list(map(self.pbi, neighborhood, weights, ideal_point, theta_adaptive)))
             return SF_values
         elif self.SF_type == "WS":
             SF_values = np.array(list(map(self.weighted_sum, neighborhood, weights)))

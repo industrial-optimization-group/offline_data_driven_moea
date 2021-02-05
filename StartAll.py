@@ -36,7 +36,7 @@ objs(10) = PFPF;
 """
 
 #main_directory = 'Offline_Prob_DDMOPP3'
-main_directory = 'Tests_CSC_4'
+main_directory = 'Tests_CSC_11'
 #main_directory = 'Tests_additional_obj1'
 #main_directory = 'Tests_Interactive_2'
 #main_directory = 'Tests_new_adapt'
@@ -44,7 +44,7 @@ main_directory = 'Tests_CSC_4'
 
 #objectives = [4,6]#,5]
 #objectives = [11]
-objectives = [2]
+objectives = [3]
 #objectives = [2,3,5]
 #objectives = [2,3,4,5,6,8,10]
 #objectives = [3,5,6,8,10]
@@ -62,7 +62,7 @@ problems = ['P1']
 #modes = [1, 7, 8]  # 1 = Gen-RVEA, 7 = Prob-RVEA 1 , 8 = Hyb-RVEA
 #modes = [12, 72, 82] # 12 = Gen-MOEA/D, 72 = Prob-MOEA/D, 82 = Hyb-MOEA/D
 
-modes = [82]
+modes = [72]
 
 
 sampling = ['LHS']
@@ -79,8 +79,8 @@ interactive = False
 #############################################
 
 
-nruns = 1
-n_parallel_jobs = 1
+nruns = 11
+n_parallel_jobs = 128
 log_time = str(datetime.datetime.now())
 #tgm.send(msg='Started testing @'+str(log_time))
 

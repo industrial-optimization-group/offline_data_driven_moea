@@ -119,7 +119,10 @@ class Population(BasePopulation):
                 design = pop_params["design"]
             else:
                 design = "LHSDesign"
-        individuals = create_new_individuals(design, problem, pop_size)
+        if design == "InitSamples":
+            individuals = pop_params["init_pop"]
+        else:
+            individuals = create_new_individuals(design, problem, pop_size)
         self.add(individuals, use_surrogates)
         self.xover = SBX_xover()
         self.mutation = BP_mutation(self.lower_limits, self.upper_limits)

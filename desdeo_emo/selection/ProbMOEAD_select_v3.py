@@ -23,7 +23,7 @@ class ProbMOEAD_select_v3(SelectionBase):
 	 # initialize
         self.SF_type = SF_type
 
-    def do(self, pop: Population, vectors: ReferenceVectors, ideal_point, current_neighborhood, offspring_fx, offspring_unc) -> List[int]:
+    def do(self, pop: Population, vectors: ReferenceVectors, ideal_point, current_neighborhood, offspring_fx, offspring_unc, theta_adaptive) -> List[int]:
         """Select the individuals that are kept in the neighborhood.
 
         Parameters
@@ -52,6 +52,7 @@ class ProbMOEAD_select_v3(SelectionBase):
         offspring_population        = np.array([offspring_fx]*num_neighbors)
         offspring_uncertainty       = np.array([offspring_unc]*num_neighbors)
         ideal_point_matrix          = np.array([ideal_point]*num_neighbors)
+        theta_adaptive_matrix       = np.array([theta_adaptive]*num_neighbors)
         n_samples = 1000
         pwrong_current = Probability_wrong(mean_values=current_population, stddev_values=current_uncertainty, n_samples=n_samples)
         pwrong_current.vect_sample_f()
@@ -59,8 +60,8 @@ class ProbMOEAD_select_v3(SelectionBase):
         pwrong_offspring = Probability_wrong(mean_values=offspring_population.reshape(-1,pop.problem.n_of_objectives), stddev_values=offspring_uncertainty.reshape(-1,pop.problem.n_of_objectives), n_samples=n_samples)
         pwrong_offspring.vect_sample_f()
 
-        values_SF_current = self._evaluate_SF(current_population, current_reference_vectors, ideal_point_matrix, pwrong_current)
-        values_SF_offspring = self._evaluate_SF(offspring_population, current_reference_vectors, ideal_point_matrix, pwrong_offspring)
+        values_SF_current = self._evaluate_SF(current_population, current_reference_vectors, ideal_point_matrix, pwrong_current, theta_adaptive_matrix)
+        values_SF_offspring = self._evaluate_SF(offspring_population, current_reference_vectors, ideal_point_matrix, pwrong_offspring, theta_adaptive_matrix)
 
         """
         ##### KDE here and then compute probability
@@ -96,7 +97,7 @@ class ProbMOEAD_select_v3(SelectionBase):
         feval   = np.sum(objective_values * weights)
         return feval
 
-    def pbi(self, objective_values, weights, ideal_point, pwrong_f_samples, theta = 5):
+    def pbi(self, objective_values, weights, ideal_point, pwrong_f_samples, theta):
 
         norm_weights    = np.linalg.norm(weights)
         weights         = weights/norm_weights
@@ -121,12 +122,12 @@ class ProbMOEAD_select_v3(SelectionBase):
         return fvalue
 
 
-    def _evaluate_SF(self, neighborhood, weights, ideal_point, pwrong):
+    def _evaluate_SF(self, neighborhood, weights, ideal_point, pwrong, theta_adaptive):
         if self.SF_type == "TCH":
             SF_values = np.array(list(map(self.tchebycheff, neighborhood, weights, ideal_point)))
             return SF_values
         elif self.SF_type == "PBI":
-            SF_values = np.array(list(map(self.pbi, neighborhood, weights, ideal_point, pwrong.f_samples)))
+            SF_values = np.array(list(map(self.pbi, neighborhood, weights, ideal_point, pwrong.f_samples, theta_adaptive)))
             return SF_values
         elif self.SF_type == "WS":
             SF_values = np.array(list(map(self.weighted_sum, neighborhood, weights)))

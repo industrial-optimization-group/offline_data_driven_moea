@@ -35,7 +35,8 @@ def create_new_individuals(design, problem, pop_size=None):
     """
 
     if pop_size is None:
-        pop_size_options = [50, 105, 120, 126, 132, 112, 156, 90, 275]
+        #pop_size_options = [50, 105, 120, 126, 132, 112, 156, 90, 275]
+        pop_size_options = np.ones(problem.num_of_objectives)*50
         pop_size = pop_size_options[problem.num_of_objectives - 2]
 
     if design == "RandomDesign":

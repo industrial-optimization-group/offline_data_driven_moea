@@ -12,10 +12,13 @@ import pandas as pd
 
 from desdeo_emo.EAs.ProbRVEA import RVEA
 from desdeo_emo.EAs.ProbRVEA import ProbRVEAv1 as ProbRVEA
+from desdeo_emo.EAs.ProbRVEA import ProbRVEAv3
 from desdeo_emo.EAs.ProbRVEA import HybRVEA
 from desdeo_emo.EAs.ProbMOEAD import MOEA_D
 from desdeo_emo.EAs.ProbMOEAD import ProbMOEAD
+from desdeo_emo.EAs.ProbMOEAD import ProbMOEAD_v3
 from desdeo_emo.EAs.ProbMOEAD import HybMOEAD
+from desdeo_emo.EAs.ProbMOEAD import HybMOEAD_v3
 #from pygmo import non_dominated_front_2d as nd2
 #from non_domx import ndx
 import scipy.io
@@ -23,7 +26,6 @@ from sklearn.neighbors import NearestNeighbors
 import time
 
 
-#max_func_evals = 40000
 max_func_evals = 40000
 nsamples = 109
 
@@ -69,9 +71,9 @@ def read_dataset(problem_testbench, folder_data, problem_name, nobjs, nvars, sam
         y = prob.evaluate(x)[0]
     return x, y
 
-def optimize_surrogates_1(problem):
+def optimize_surrogates_1(problem,x):
     print("Optimizing...")
-    evolver_opt = RVEA(problem, use_surrogates=True, n_gen_per_iter=100, total_function_evaluations=max_func_evals)
+    evolver_opt = RVEA(problem, use_surrogates=True, n_gen_per_iter=100, total_function_evaluations=max_func_evals) #, population_params={'design':'InitSamples','init_pop':x}, population_size=109)
     while evolver_opt.continue_evolution():
         evolver_opt.iterate()
         print("FE count:",evolver_opt._function_evaluation_count)
@@ -80,9 +82,9 @@ def optimize_surrogates_1(problem):
     #print(front_true)
     return evolver_opt.population
 
-def optimize_surrogates_7(problem):
+def optimize_surrogates_7(problem,x):
     print("Optimizing...")
-    evolver_opt = ProbRVEA(problem, use_surrogates=True, n_gen_per_iter=100, total_function_evaluations=max_func_evals)
+    evolver_opt = ProbRVEAv3(problem, use_surrogates=True, n_gen_per_iter=100, total_function_evaluations=max_func_evals) #, population_params={'design':'InitSamples','init_pop':x}, population_size=109)
     while evolver_opt.continue_evolution():
         evolver_opt.iterate()
         print("FE count:",evolver_opt._function_evaluation_count)
@@ -91,9 +93,9 @@ def optimize_surrogates_7(problem):
     #print(front_true)
     return evolver_opt.population
 
-def optimize_surrogates_8(problem):
+def optimize_surrogates_8(problem,x):
     print("Optimizing...")
-    evolver_opt = HybRVEA(problem, use_surrogates=True, n_gen_per_iter=100, total_function_evaluations=max_func_evals)
+    evolver_opt = HybRVEA(problem, use_surrogates=True, n_gen_per_iter=100, total_function_evaluations=max_func_evals) #, population_params={'design':'InitSamples','init_pop':x}, population_size=109)
     while evolver_opt.continue_evolution():
         evolver_opt.iterate()
         print("FE count:",evolver_opt._function_evaluation_count)
@@ -102,9 +104,9 @@ def optimize_surrogates_8(problem):
     #print(front_true)
     return evolver_opt.population
 
-def optimize_surrogates_12(problem):
+def optimize_surrogates_12(problem,x):
     print("Optimizing...")
-    evolver_opt = MOEA_D(problem, use_surrogates=True, n_gen_per_iter=100, total_function_evaluations=max_func_evals)
+    evolver_opt = MOEA_D(problem, use_surrogates=True, n_gen_per_iter=100, total_function_evaluations=max_func_evals) #, population_params={'design':'InitSamples','init_pop':x}, population_size=109)
     while evolver_opt.continue_evolution():
         evolver_opt.iterate()
         print("FE count:",evolver_opt._function_evaluation_count)
@@ -113,9 +115,9 @@ def optimize_surrogates_12(problem):
     #print(front_true)
     return evolver_opt.population
 
-def optimize_surrogates_72(problem):
+def optimize_surrogates_72(problem,x):
     print("Optimizing...")
-    evolver_opt = ProbMOEAD(problem, use_surrogates=True, n_gen_per_iter=100, total_function_evaluations=max_func_evals)
+    evolver_opt = ProbMOEAD(problem, use_surrogates=True, n_gen_per_iter=100, total_function_evaluations=max_func_evals) #, population_params={'design':'InitSamples','init_pop':x}) #, population_size=109)
     while evolver_opt.continue_evolution():
         evolver_opt.iterate()
         print("FE count:",evolver_opt._function_evaluation_count)
@@ -124,9 +126,9 @@ def optimize_surrogates_72(problem):
     #print(front_true)
     return evolver_opt.population
 
-def optimize_surrogates_82(problem):
+def optimize_surrogates_82(problem,x):
     print("Optimizing...")
-    evolver_opt = HybMOEAD(problem, use_surrogates=True, n_gen_per_iter=100, total_function_evaluations=max_func_evals)
+    evolver_opt = HybMOEAD_v3(problem, use_surrogates=True, n_gen_per_iter=100, total_function_evaluations=max_func_evals) #, population_params={'design':'InitSamples','init_pop':x}, population_size=109)
     while evolver_opt.continue_evolution():
         evolver_opt.iterate()
         print("FE count:",evolver_opt._function_evaluation_count)
@@ -141,17 +143,17 @@ def run_optimizer(problem_testbench, folder_data, problem_name, nobjs, nvars, sa
     surrogate_problem, time_taken = build_surrogates(problem_testbench,problem_name, nobjs, nvars, is_data, x, y)
     print(time_taken)
     if approach == 1:
-        population = optimize_surrogates_1(surrogate_problem)
+        population = optimize_surrogates_1(surrogate_problem,x)
     elif approach == 7:
-        population = optimize_surrogates_7(surrogate_problem)
+        population = optimize_surrogates_7(surrogate_problem,x)
     elif approach == 8:
-        population = optimize_surrogates_8(surrogate_problem)
+        population = optimize_surrogates_8(surrogate_problem,x)
     elif approach == 12:
-        population = optimize_surrogates_12(surrogate_problem)
+        population = optimize_surrogates_12(surrogate_problem,x)
     elif approach == 72:
-        population = optimize_surrogates_72(surrogate_problem)
+        population = optimize_surrogates_72(surrogate_problem,x)
     elif approach == 82:
-        population = optimize_surrogates_82(surrogate_problem)
+        population = optimize_surrogates_82(surrogate_problem,x)
     results_dict = {
             'individual_archive': population.individuals_archive,
             'objectives_archive': population.objectives_archive,

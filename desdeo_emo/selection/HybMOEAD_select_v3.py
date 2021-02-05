@@ -6,7 +6,7 @@ from desdeo_emo.othertools.ReferenceVectors import ReferenceVectors
 from desdeo_emo.othertools.ProbabilityWrong import Probability_wrong
 
 
-class HybMOEAD_select(SelectionBase):
+class HybMOEAD_select_v3(SelectionBase):
     """The MOEAD selection operator. 
 
     Parameters
@@ -66,15 +66,16 @@ class HybMOEAD_select(SelectionBase):
         
         
         # Probabilistic MOEA/D selection
-        pwrong_current = Probability_wrong(mean_values=current_population, stddev_values=current_uncertainty, n_samples=1000)
+        pwrong_current = Probability_wrong(mean_values=current_population, stddev_values=current_uncertainty, n_samples=n_samples)
         pwrong_current.vect_sample_f()
 
-        pwrong_offspring = Probability_wrong(mean_values=offspring_population.reshape(-1,pop.problem.n_of_objectives), stddev_values=offspring_uncertainty.reshape(-1,pop.problem.n_of_objectives), n_samples=1000)
+        pwrong_offspring = Probability_wrong(mean_values=offspring_population.reshape(-1,pop.problem.n_of_objectives), stddev_values=offspring_uncertainty.reshape(-1,pop.problem.n_of_objectives), n_samples=n_samples)
         pwrong_offspring.vect_sample_f()
 
         values_SF_current_dist   = self._evaluate_SF_dist(current_population, current_reference_vectors, ideal_point_matrix, pwrong_current, theta_adaptive_matrix)
         values_SF_offspring_dist = self._evaluate_SF_dist(offspring_population, current_reference_vectors, ideal_point_matrix, pwrong_offspring, theta_adaptive_matrix)
 
+        """
         ##### KDE here and then compute probability
         pwrong_current.pdf_list = {}
         pwrong_current.ecdf_list = {}
@@ -94,11 +95,11 @@ class HybMOEAD_select(SelectionBase):
         #print("Selection prob:", selection_probabilitic)   
         selection = np.union1d(selection_generic,selection_probabilitic)
         #print("Overall selection:", selection)
-
+        """
         # considering mean 
-        #selection_probabilitic_2 = np.where(np.mean(values_SF_offspring_dist, axis=1) < np.mean(values_SF_current_dist, axis=1))[0]
-        #selection_2 = np.union1d(selection_generic,selection_probabilitic_2)
-        #print("Overall selection 2:", selection_2)
+        selection_probabilitic_2 = np.where(np.mean(values_SF_offspring_dist, axis=1) < np.mean(values_SF_current_dist, axis=1))[0]
+        selection = np.union1d(selection_generic,selection_probabilitic_2)
+        #print("Overall selection 2:", selection)
         
         return current_neighborhood[selection]
 
