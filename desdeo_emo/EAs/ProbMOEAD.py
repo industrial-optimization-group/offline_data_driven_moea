@@ -14,11 +14,15 @@ from desdeo_emo.population.Population import Population
 from desdeo_problem.Problem import MOProblem
 
 from desdeo_emo.selection import tournament_select
+
+from desdeo_emo.selection.MOEAD_select import MOEAD_select
+
 from desdeo_emo.selection.ProbMOEAD_select import ProbMOEAD_select
 from desdeo_emo.selection.ProbMOEAD_select_v3 import ProbMOEAD_select_v3
+
 from desdeo_emo.selection.HybMOEAD_select import HybMOEAD_select
 from desdeo_emo.selection.HybMOEAD_select_v3 import HybMOEAD_select_v3
-from desdeo_emo.selection.MOEAD_select import MOEAD_select
+
 from desdeo_emo.recombination.BoundedPolynomialMutation import BP_mutation
 from desdeo_emo.recombination.SimulatedBinaryCrossover import SBX_xover
 import copy
@@ -26,7 +30,6 @@ import copy
 
 theta_min = 0
 theta_max = 500
-
 
 class MOEA_D(BaseDecompositionEA):
     """Python implementation of MOEA/D
@@ -171,7 +174,6 @@ class MOEA_D(BaseDecompositionEA):
     def _select(self, current_neighborhood, offspring_fx, theta_adaptive) -> list:
         return self.selection_operator.do(self.population,self.reference_vectors,self._ideal_point, current_neighborhood, offspring_fx, theta_adaptive)
 
-
 class ProbMOEAD(MOEA_D):
     def __init__(  #parameters of the class
         self,
@@ -256,7 +258,6 @@ class ProbMOEAD(MOEA_D):
         #print("Selection:",zz)
         return zz
 
-
 class HybMOEAD(MOEA_D):
     def __init__(  #parameters of the class
         self,
@@ -340,8 +341,6 @@ class HybMOEAD(MOEA_D):
         #print("Selection:",zz)
         return zz
 
-
-
 class ProbMOEAD_v3(MOEA_D):
     def __init__(  #parameters of the class
         self,
@@ -424,7 +423,6 @@ class ProbMOEAD_v3(MOEA_D):
         zz= self.selection_operator.do(self.population,self.reference_vectors,self._ideal_point, current_neighborhood, offspring_fx, offspring_unc, theta_adaptive)
         #print("Selection:",zz)
         return zz
-
 
 class HybMOEAD_v3(MOEA_D):
     def __init__(  #parameters of the class

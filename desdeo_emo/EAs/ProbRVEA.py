@@ -9,6 +9,7 @@ from desdeo_emo.selection.Prob_APD_Select_v1 import Prob_APD_select_v1  # orgina
 #from desdeo_emo.selection.Prob_APD_Select_v2 import Prob_APD_Select_v2  # faster by computational tricks
 from desdeo_emo.selection.Prob_APD_Select_v3 import Prob_APD_select_v3  # superfast y considering mean APD
 from desdeo_emo.selection.Prob_Hybrid_APD_Select import Prob_Hybrid_APD_Select   # hybrid approach with mean selection
+from desdeo_emo.selection.Prob_Hybrid_APD_Select_v3 import Prob_Hybrid_APD_Select_v3   # hybrid approach with mean selection
 from desdeo_problem.Problem import MOProblem
 import numpy as np
 from desdeo_tools.interaction import (
@@ -240,7 +241,7 @@ class RVEA(BaseDecompositionEA):
         self.reference_vectors.neighbouring_angles()
 
 
-class ProbRVEAv1(RVEA):
+class ProbRVEA(RVEA):
     def __init__(
         self,
         problem: MOProblem,
@@ -312,7 +313,7 @@ class ProbRVEAv2(RVEA):
         self.selection_operator = selection_operator
 """
 
-class ProbRVEAv3(RVEA):
+class ProbRVEA_v3(RVEA):
     def __init__(
         self,
         problem: MOProblem,
@@ -378,6 +379,41 @@ class HybRVEA(RVEA):
             total_function_evaluations=total_function_evaluations,
         )
         selection_operator = Prob_Hybrid_APD_Select(
+            self.population, self.time_penalty_function, alpha
+        )
+        self.selection_operator = selection_operator
+
+class HybRVEA_v3(RVEA):
+    def __init__(
+        self,
+        problem: MOProblem,
+        population_size: int = None,
+        population_params: Dict = None,
+        initial_population: Population = None,
+        alpha: float = 2,
+        lattice_resolution: int = None,
+        a_priori: bool = False,
+        interact: bool = False,
+        use_surrogates: bool = False,
+        n_iterations: int = 10,
+        n_gen_per_iter: int = 100,
+        total_function_evaluations: int = 0,
+        time_penalty_component: Union[str, float] = None,
+    ):
+        super().__init__(
+            problem=problem,
+            population_size=population_size,
+            population_params=population_params,
+            initial_population=initial_population,
+            lattice_resolution=lattice_resolution,
+            a_priori=a_priori,
+            interact=interact,
+            use_surrogates=use_surrogates,
+            n_iterations=n_iterations,
+            n_gen_per_iter=n_gen_per_iter,
+            total_function_evaluations=total_function_evaluations,
+        )
+        selection_operator = Prob_Hybrid_APD_Select_v3(
             self.population, self.time_penalty_function, alpha
         )
         self.selection_operator = selection_operator
