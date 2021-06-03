@@ -104,12 +104,12 @@ class ProbMOEAD_select(SelectionBase):
         return feval
     
     def calc_m(self, mu_a, mu_b, sigma_b, weights):
-        #return (np.sum(mu_a*weights)-np.sum(mu_b*weights))/np.sum((weights**2)*(sigma_b**2))
-        return (np.sum(mu_a*weights)-np.sum(mu_b*weights))/np.sum((weights)*(sigma_b))
+        return (np.sum(mu_a*weights)-np.sum(mu_b*weights))/np.sqrt(np.sum((weights**2)*(sigma_b**2)))
+        #return (np.sum(mu_a*weights)-np.sum(mu_b*weights))/np.sum((weights)*(sigma_b))
 
     def calc_s(self, sigma_a, sigma_b, weights):
-        #return np.sum((weights**2)*(sigma_a**2))/np.sum((weights**2)*(sigma_b**2))
-        return np.sum((weights)*(sigma_a))/np.sum((weights)*(sigma_b))
+        return np.sqrt(np.sum((weights**2)*(sigma_a**2)))/np.sqrt(np.sum((weights**2)*(sigma_b**2)))
+        #return np.sum((weights)*(sigma_a))/np.sum((weights)*(sigma_b))
 
     def compute_probability_wrong_WS_analytic(self, parent_mean, parent_unc, offspring_mean, offspring_unc, weights):
         m= self.calc_m(parent_mean, offspring_mean, offspring_unc, weights)
