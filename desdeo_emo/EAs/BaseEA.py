@@ -75,7 +75,11 @@ class BaseEA:
 
     def continue_evolution(self) -> bool:
         """Checks whether the current iteration should be continued or not."""
-        return self._iteration_counter < self.n_iterations and self.check_FE_count()
+        #return self._iteration_counter < self.n_iterations and self.check_FE_count()
+        if self.total_function_evaluations == 0:
+            return self._iteration_counter < self.n_iterations
+        else:
+            return self.check_FE_count()
 
     def check_FE_count(self) -> bool:
         """Checks whether termination criteria via function evaluation count has been

@@ -62,14 +62,14 @@ def build_surrogates(problem_testbench, problem_name, nobjs, nvars, is_data, x_d
 
 def read_dataset(problem_testbench, folder_data, problem_name, nobjs, nvars, sampling, run):
     if problem_testbench == "DDMOPP":
-        mat = scipy.io.loadmat('./' + folder_data + '/Initial_Population_' + problem_testbench + '_' + sampling +
+        mat = scipy.io.loadmat(folder_data + '/Initial_Population_' + problem_testbench + '_' + sampling +
                             '_AM_' + str(nvars) + '_109.mat')
         x = ((mat['Initial_Population_'+problem_testbench])[0][run])[0]
-        mat = scipy.io.loadmat('./'+folder_data+'/Obj_vals_DDMOPP_'+sampling+'_AM_'+problem_name+'_'
+        mat = scipy.io.loadmat(folder_data+'/Obj_vals_DDMOPP_'+sampling+'_AM_'+problem_name+'_'
                                        + str(nobjs) + '_' + str(nvars) + '_109.mat')
         y = ((mat['Obj_vals_DDMOPP'])[0][run])[0]
     else:
-        mat = scipy.io.loadmat('./' + folder_data + '/Initial_Population_DTLZ_'+sampling+'_AM_' + str(nvars) + '_109.mat')
+        mat = scipy.io.loadmat(folder_data + '/Initial_Population_DTLZ_'+sampling+'_AM_' + str(nvars) + '_109.mat')
         prob = test_problem_builder(
             name=problem_name, n_of_objectives=nobjs, n_of_variables=nvars
         )

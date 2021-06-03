@@ -1,3 +1,5 @@
+import sys
+sys.path.insert(1, '/home/amrzr/Work/Codes/offline_data_driven_moea/')
 #import Main_Execute_Prob as mexeprob
 import Main_Execute as mexe
 #import Main_Execute_interactive as mexe_int
@@ -16,7 +18,8 @@ dims = [10]
 sample_size = 109
 #dims = 4
 ############################################
-folder_data = 'AM_Samples_109_Final'
+data_folder = '/home/amrzr/Work/Codes/data'
+folder_data = '/home/amrzr/Work/Codes/data/AM_Samples_109_Final'
 #folder_data = 'AM_Samples_1000'
 
 #problem_testbench = 'DTLZ'
@@ -36,7 +39,7 @@ objs(10) = PFPF;
 """
 
 #main_directory = 'Offline_Prob_DDMOPP3'
-main_directory = 'Tests_CSC_11'
+main_directory = '/home/amrzr/Work/Codes/data/test_runs/Tests_offline_prob_main'
 #main_directory = 'Tests_additional_obj1'
 #main_directory = 'Tests_Interactive_2'
 #main_directory = 'Tests_new_adapt'
@@ -62,7 +65,7 @@ problems = ['P1']
 #modes = [1, 7, 8]  # 1 = Gen-RVEA, 7 = Prob-RVEA 1 , 8 = Hyb-RVEA
 #modes = [12, 72, 82] # 12 = Gen-MOEA/D, 72 = Prob-MOEA/D, 82 = Hyb-MOEA/D
 
-modes = [72]
+modes = [7]
 
 
 sampling = ['LHS']
@@ -79,8 +82,8 @@ interactive = False
 #############################################
 
 
-nruns = 11
-n_parallel_jobs = 128
+nruns = 1
+n_parallel_jobs = 1
 log_time = str(datetime.datetime.now())
 #tgm.send(msg='Started testing @'+str(log_time))
 
