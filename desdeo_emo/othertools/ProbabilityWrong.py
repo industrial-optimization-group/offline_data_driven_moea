@@ -19,6 +19,7 @@ plt.rcParams.update({'font.size': 15})
 
 rx = np.zeros((3,2,2))
 operator = 'PBI'
+n_samples= 1000
 
 class Probability_wrong:
     """Class for computing the probability of wrong selection of a distribution"""
@@ -417,3 +418,11 @@ class Probability_wrong:
         #prob_wrong = integrate.quad(prob_mult_vect, 0, np.inf, args=(pdf_A, cdf_B))
         prob_wrong = integrate.quad(prob_mult_vect, 0, max_range, args=(pdf_A, cdf_B))
         return prob_wrong[0]
+
+    def compute_probability_wrong_MC(self, samples_A, samples_B):
+        # Compute P_{wrong}(A>B)
+        a_final=np.tile(samples_A,(n_samples,1))
+        b_final=np.transpose(np.tile(samples_B,(n_samples,1)))
+        return(np.sum(a_final>b_final)/(n_samples**2))
+    
+

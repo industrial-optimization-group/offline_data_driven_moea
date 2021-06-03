@@ -4,7 +4,7 @@ from desdeo_emo.selection.SelectionBase import SelectionBase
 from desdeo_emo.population.Population import Population
 from desdeo_emo.othertools.ReferenceVectors import ReferenceVectors
 from desdeo_emo.othertools.ProbabilityWrong import Probability_wrong
-
+import scipy
 
 class ProbMOEAD_select(SelectionBase):
     """The MOEAD selection operator. 
@@ -77,6 +77,11 @@ class ProbMOEAD_select(SelectionBase):
         probabilities = np.zeros(num_neighbors)
         for i in range(num_neighbors):
             probabilities[i]=pwrong_current.compute_probability_wrong_PBI(pwrong_offspring, index=i)
+            print("P_wrong_integral:",probabilities[i])
+            probabilities[i]=pwrong_current.compute_probability_wrong_MC(values_SF_current[i], values_SF_offspring[i])
+            print("P_wrong_MC:",probabilities[i])
+            probabilities[i]= self.compute_probability_wrong_WS_analytic(current_population[i],current_uncertainty[i],offspring_fx.reshape(-1), offspring_unc.reshape(-1) ,current_reference_vectors[i])
+            print("P_wrong_analytical:",probabilities[i])
         # Compare the offspring with the individuals in the neighborhood 
         # and replace the ones which are outperformed by it if P_{wrong}>0.5
         selection = np.where(probabilities>0.5)[0]
@@ -93,9 +98,29 @@ class ProbMOEAD_select(SelectionBase):
         max_fun = np.max(feval)
         return max_fun
 
-    def weighted_sum(self, objective_values, weights):
-        feval   = np.sum(objective_values * weights)
+    def weighted_sum(self, objective_values, weights, pwrong_f_samples):
+        #feval   = np.sum(objective_values * weights)
+        feval   = np.sum(np.transpose(pwrong_f_samples) * np.tile(weights,(1000,1)), axis=1)
         return feval
+    
+    def calc_m(self, mu_a, mu_b, sigma_b, weights):
+        #return (np.sum(mu_a*weights)-np.sum(mu_b*weights))/np.sum((weights**2)*(sigma_b**2))
+        return (np.sum(mu_a*weights)-np.sum(mu_b*weights))/np.sum((weights)*(sigma_b))
+
+    def calc_s(self, sigma_a, sigma_b, weights):
+        #return np.sum((weights**2)*(sigma_a**2))/np.sum((weights**2)*(sigma_b**2))
+        return np.sum((weights)*(sigma_a))/np.sum((weights)*(sigma_b))
+
+    def compute_probability_wrong_WS_analytic(self, parent_mean, parent_unc, offspring_mean, offspring_unc, weights):
+        m= self.calc_m(parent_mean, offspring_mean, offspring_unc, weights)
+        s = self.calc_s(parent_unc, offspring_unc, weights)
+        #print("m :",m)
+        #print("s :",s)
+        pwrong_A_B = 0.5+0.5*scipy.special.erf(m/np.sqrt(2+2*s**2))
+        print("P_wrong_erf:",pwrong_A_B)
+        pwrong_A_B = 0.5*(1+np.tanh(m/(0.8*np.sqrt(2+2*s**2))))
+        print("P_wrong_tanh:",pwrong_A_B)
+        return pwrong_A_B
 
     def pbi(self, objective_values, weights, ideal_point, pwrong_f_samples, theta):
 
@@ -130,7 +155,7 @@ class ProbMOEAD_select(SelectionBase):
             SF_values = np.array(list(map(self.pbi, neighborhood, weights, ideal_point, pwrong.f_samples, theta_adaptive)))
             return SF_values
         elif self.SF_type == "WS":
-            SF_values = np.array(list(map(self.weighted_sum, neighborhood, weights)))
+            SF_values = np.array(list(map(self.weighted_sum, neighborhood, weights, pwrong.f_samples)))
             return SF_values
         else:
             return []
