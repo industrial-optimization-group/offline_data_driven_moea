@@ -90,7 +90,7 @@ def optimize_surrogates_1(problem,x):
 
 def optimize_surrogates_7(problem,x):
     print("Optimizing...")
-    evolver_opt = ProbRVEA_v3(problem, use_surrogates=True, n_gen_per_iter=gen_per_iter_set, total_function_evaluations=max_func_evals) #, population_params={'design':'InitSamples','init_pop':x}, population_size=109)
+    evolver_opt = ProbRVEA_v3(problem, use_surrogates=True, n_gen_per_iter=gen_per_iter_set, total_function_evaluations=max_func_evals, population_params={'design':'InitSamples','init_pop':x}, population_size=109)
     while evolver_opt.continue_evolution():
         evolver_opt.iterate()
         print("FE count:",evolver_opt._function_evaluation_count)
@@ -101,7 +101,7 @@ def optimize_surrogates_7(problem,x):
 
 def optimize_surrogates_8(problem,x):
     print("Optimizing...")
-    evolver_opt = HybRVEA_v3(problem, use_surrogates=True, n_gen_per_iter=gen_per_iter_set, total_function_evaluations=max_func_evals) #, population_params={'design':'InitSamples','init_pop':x}, population_size=109)
+    evolver_opt = HybRVEA_v3(problem, use_surrogates=True, n_gen_per_iter=gen_per_iter_set, total_function_evaluations=max_func_evals, population_params={'design':'InitSamples','init_pop':x}, population_size=109)
     while evolver_opt.continue_evolution():
         evolver_opt.iterate()
         print("FE count:",evolver_opt._function_evaluation_count)
@@ -123,7 +123,7 @@ def optimize_surrogates_12(problem,x):
 
 def optimize_surrogates_72(problem,x):
     print("Optimizing...")
-    evolver_opt = ProbMOEAD_v3(problem, use_surrogates=True, n_gen_per_iter=gen_per_iter_set, total_function_evaluations=max_func_evals) #, population_params={'design':'InitSamples','init_pop':x}) #, population_size=109)
+    evolver_opt = ProbMOEAD_v3(problem, use_surrogates=True, n_gen_per_iter=gen_per_iter_set, total_function_evaluations=max_func_evals, population_params={'design':'InitSamples','init_pop':x}) #, population_size=109)
     while evolver_opt.continue_evolution():
         evolver_opt.iterate()
         print("FE count:",evolver_opt._function_evaluation_count)

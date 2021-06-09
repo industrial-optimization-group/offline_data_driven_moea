@@ -47,7 +47,7 @@ main_directory = '/home/amrzr/Work/Codes/data/test_runs/Tests_offline_prob_main'
 
 #objectives = [4,6]#,5]
 #objectives = [11]
-objectives = [3]
+objectives = [5]
 #objectives = [2,3,5]
 #objectives = [2,3,4,5,6,8,10]
 #objectives = [3,5,6,8,10]
@@ -65,7 +65,7 @@ problems = ['P1']
 #modes = [1, 7, 8]  # 1 = Gen-RVEA, 7 = Prob-RVEA 1 , 8 = Hyb-RVEA
 #modes = [12, 72, 82] # 12 = Gen-MOEA/D, 72 = Prob-MOEA/D, 82 = Hyb-MOEA/D
 
-modes = [722]
+modes = [8]
 
 
 sampling = ['LHS']
@@ -90,6 +90,7 @@ log_time = str(datetime.datetime.now())
 
 
 def parallel_execute(run, mode, algo, prob, n_vars, obj, samp):
+    #run=run+12
     path_to_file = main_directory \
                 + '/Offline_Mode_' + str(mode) + '_' + algo + \
                 '/' + samp + '/' + prob + '_' + str(obj) + '_' + str(n_vars)
@@ -114,7 +115,7 @@ def parallel_execute(run, mode, algo, prob, n_vars, obj, samp):
 
 
 #try:
-    
+"""    
 temp = Parallel(n_jobs=n_parallel_jobs)(
     delayed(parallel_execute)(run, mode, algo, prob, n_vars, obj, samp) for run in range(nruns) 
     for algo in emo_algorithm
@@ -128,5 +129,13 @@ temp = Parallel(n_jobs=n_parallel_jobs)(
 #    tgm.send(msg='Finished Testing: \n' + path_to_file)
 #except Exception as e:
 #    print(e)
-
+"""
+for algo in emo_algorithm:
+    for prob in problems:
+        for n_vars in dims:
+            for samp in sampling:
+                for obj in objectives:
+                    for mode in modes:
+                        for run in range(nruns):
+                            parallel_execute(run, mode, algo, prob, n_vars, obj, samp)
 

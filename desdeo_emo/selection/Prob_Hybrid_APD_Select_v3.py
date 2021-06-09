@@ -105,17 +105,21 @@ class Prob_Hybrid_APD_Select_v3(SelectionBase):
         selection_prob = np.array([], dtype=int)
 
         selection = np.array([], dtype=int)
-
+        #print("**************New Generation************")
         # Selection
         for i in range(0, len(vectors.values)):
             #print("sub pop index:",i)
+            #sub_population_index_prob = np.atleast_1d(
+            #    np.squeeze(np.where(assigned_vectors_prob == i))
+            #)
             sub_population_index_prob = np.atleast_1d(
-                np.squeeze(np.where(assigned_vectors_prob == i))
+                np.squeeze(np.where(assigned_vectors_gen == i))
             )
             sub_population_index_gen = np.atleast_1d(
                 np.squeeze(np.where(assigned_vectors_gen == i))
             )
             sub_population_fitness_prob = pwrong.f_samples[sub_population_index_prob]
+            #sub_population_fitness_prob = pwrong.f_samples[sub_population_index_gen]
             sub_population_fitness_gen = translated_fitness[sub_population_index_gen]
             
             if len(sub_population_fitness_gen) > 0:
@@ -175,14 +179,19 @@ class Prob_Hybrid_APD_Select_v3(SelectionBase):
                     selection_prob = np.hstack((selection_prob, np.transpose(selx_prob[0])))
                 else:
                     selection_prob = np.vstack((selection_prob, np.transpose(selx_prob[0])))                            
+        selection_gen = selection_gen.squeeze()
+        selection_prob = selection_prob.squeeze()
         #print("Selection gen:",selection_gen)
         #print("Selection prob:",selection_prob)
         selection = np.union1d(selection_gen,selection_prob)
-        if selection.shape[0] == 1:
+        #print("Selection union:",selection)
+        while selection.shape[0] == 1:
             rand_select = np.random.randint(len(fitness), size=1)
-            selection = np.vstack((selection, np.transpose(rand_select[0])))
+            #selection = np.vstack((selection, np.transpose(rand_select[0])))
+            selection = np.union1d(selection,np.transpose(rand_select[0]))
+        selection = selection.squeeze()
         #print("Selection all:",selection)
-        return selection.squeeze()
+        return selection
 
     def _partial_penalty_factor(self) -> float:
         """Calculate and return the partial penalty factor for APD calculation.
@@ -194,9 +203,12 @@ class Prob_Hybrid_APD_Select_v3(SelectionBase):
         float
             The partial penalty value
         """
-        penalty = ((self.time_penalty_function()) ** self.alpha) * self.n_of_objectives
-        if penalty < 0:
-            penalty = 0
-        if penalty > 1:
-            penalty = 1
+        if self.time_penalty_function() < 0:
+            px = 0
+        elif self.time_penalty_function() > 1:
+            px = 1
+        else:
+            px= self.time_penalty_function()
+        penalty = ((px) ** self.alpha) * self.n_of_objectives
+
         return penalty

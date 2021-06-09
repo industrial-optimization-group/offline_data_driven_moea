@@ -8,8 +8,10 @@ from desdeo_emo.selection.APD_Select_constraints import APD_Select
 from desdeo_emo.selection.Prob_APD_Select_v1 import Prob_APD_select_v1  # orginal 
 #from desdeo_emo.selection.Prob_APD_Select_v2 import Prob_APD_Select_v2  # faster by computational tricks
 from desdeo_emo.selection.Prob_APD_Select_v3 import Prob_APD_select_v3  # superfast y considering mean APD
+#from desdeo_emo.selection.Prob_APD_Select_v3_1 import Prob_APD_select_v3_1 as Prob_APD_select_v3  # superfast y considering mean APD
 from desdeo_emo.selection.Prob_Hybrid_APD_Select import Prob_Hybrid_APD_Select   # hybrid approach with mean selection
 from desdeo_emo.selection.Prob_Hybrid_APD_Select_v3 import Prob_Hybrid_APD_Select_v3   # hybrid approach with mean selection
+#from desdeo_emo.selection.Prob_Hybrid_APD_Select_v3_1 import Prob_Hybrid_APD_Select_v3_1 as Prob_Hybrid_APD_Select_v3
 from desdeo_problem.Problem import MOProblem
 import numpy as np
 from desdeo_tools.interaction import (

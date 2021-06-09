@@ -1,6 +1,7 @@
 import numpy as np
 import scipy.integrate as integrate
-from sklearn.neighbors.kde import KernelDensity
+#from sklearn.neighbors.kde import KernelDensity
+from sklearn.neighbors import KernelDensity
 from scipy.stats import truncnorm
 import multiprocessing as mp
 import itertools
