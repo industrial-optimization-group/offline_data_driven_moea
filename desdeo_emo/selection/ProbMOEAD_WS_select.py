@@ -5,6 +5,7 @@ from desdeo_emo.population.Population import Population
 from desdeo_emo.othertools.ReferenceVectors import ReferenceVectors
 from desdeo_emo.othertools.ProbabilityWrong import Probability_wrong
 import scipy
+from scipy.stats import norm
 
 class ProbMOEAD_select(SelectionBase):
     """The MOEAD selection operator. 
@@ -92,6 +93,14 @@ class ProbMOEAD_select(SelectionBase):
 
         return current_neighborhood[selection]
 
+    def get_pdf_g_tcheby(g, m, s):
+        g_m_s = (g-m)/s
+        pdf_i = norm.pdf(g_m_s)
+        cdf_i = norm.cdf(g_m_s)
+        prod_cdf_g = np.prod(cdf_i)
+        sigma_term = np.sum((pdf_i/cdf_i)/s)
+        pdf_g = sigma_term * prod_cdf_g
+        return pdf_g
 
     def tchebycheff(self, objective_values:np.ndarray, weights:np.ndarray, ideal_point:np.ndarray):
         feval   = np.abs(objective_values - ideal_point) * weights
