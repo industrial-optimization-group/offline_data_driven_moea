@@ -93,7 +93,9 @@ class ProbMOEAD_select(SelectionBase):
 
         return current_neighborhood[selection]
 
-    def get_pdf_g_tcheby(g, m, s):
+    def get_pdf_g_tcheby(g, w, z, mu_f, sigma_f):
+        m=w*(mu_f-z)
+        s=w*sigma_f
         g_m_s = (g-m)/s
         pdf_i = norm.pdf(g_m_s)
         cdf_i = norm.cdf(g_m_s)
