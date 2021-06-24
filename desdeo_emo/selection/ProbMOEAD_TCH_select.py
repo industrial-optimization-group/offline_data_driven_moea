@@ -6,6 +6,7 @@ from desdeo_emo.othertools.ReferenceVectors import ReferenceVectors
 from desdeo_emo.othertools.ProbabilityWrong import Probability_wrong
 import scipy
 from scipy.stats import norm
+import scipy.integrate as integrate
 
 class ProbMOEAD_select(SelectionBase):
     """The MOEAD selection operator. 
@@ -73,43 +74,55 @@ class ProbMOEAD_select(SelectionBase):
         values_SF_current_temp = np.asarray([values_SF_current])
         pwrong_offspring.compute_pdf(values_SF_offspring_temp.reshape(num_neighbors,1,n_samples))
         pwrong_current.compute_pdf(values_SF_current_temp.reshape(num_neighbors,1,n_samples))
-        #pwrong_offspring.plt_density(values_SF_offspring.reshape(20,1,1000))
-        #pwrong_current.plt_density(values_SF_current_temp.reshape(20,1,1000))
         probabilities = np.zeros(num_neighbors)
         for i in range(num_neighbors):
-            # Using integral of pdf
+            # Using integral of KDE pdf
             #probabilities[i]=pwrong_current.compute_probability_wrong_PBI(pwrong_offspring, index=i)
             #print("P_wrong_integral:",probabilities[i])
-            # cheaper MC comparison
+            # cheaper MC samples comparison
             #probabilities[i]=pwrong_current.compute_probability_wrong_MC(values_SF_current[i], values_SF_offspring[i])
             #print("P_wrong_MC:",probabilities[i])
-            # analytical computation
-            probabilities[i]= self.compute_probability_wrong_WS_analytic(current_population[i],current_uncertainty[i],offspring_fx.reshape(-1), offspring_unc.reshape(-1) ,current_reference_vectors[i])
+            # closed form TCH computation
+            probabilities[i]= self.compute_probability_wrong_TCH(current_population[i],current_uncertainty[i],offspring_fx.reshape(-1), offspring_unc.reshape(-1) ,current_reference_vectors[i], ideal_point)
             #print("P_wrong_analytical:",probabilities[i])
         # Compare the offspring with the individuals in the neighborhood 
         # and replace the ones which are outperformed by it if P_{wrong}>0.5
         selection = np.where(probabilities>0.5)[0]
-
-        # Considering mean
-        # selection2 = np.where(np.mean(values_SF_offspring, axis=1) < np.mean(values_SF_current, axis=1))[0]
         #print("Selection:",selection)
-
         return current_neighborhood[selection]
 
-    def get_pdf_g_tcheby(g, w, z, mu_f, sigma_f):
+    def get_pdf_g_tcheby(self, x, w, z, mu_f, sigma_f):
+        g=x
         m=w*(mu_f-z)
         s=w*sigma_f
         g_m_s = (g-m)/s
         pdf_i = norm.pdf(g_m_s)
         cdf_i = norm.cdf(g_m_s)
+        s=s+0.00000000001
+        cdf_i = cdf_i + 0.00000000001 
         prod_cdf_g = np.prod(cdf_i)
         sigma_term = np.sum((pdf_i/cdf_i)/s)
         pdf_g = sigma_term * prod_cdf_g
+        #print(pdf_g)
         return pdf_g
+    
+    def compute_cdf_TCH(self, g, w, z, mu_f, sigma_f):
+        return integrate.quad(self.get_pdf_g_tcheby,0, g, args=(w, z, mu_f, sigma_f))[0]
 
-    def tchebycheff(self, objective_values:np.ndarray, weights:np.ndarray, ideal_point:np.ndarray):
-        feval   = np.abs(objective_values - ideal_point) * weights
-        max_fun = np.max(feval)
+    def compute_inner_product(self, x, mu_current, unc_current, mu_off, unc_off, ref_v, ideal):
+        inner_product = self.get_pdf_g_tcheby(x, ref_v, ideal, mu_current, unc_current) * self.compute_cdf_TCH(x, ref_v, ideal, mu_off, unc_off)
+        #print(inner_product)
+        return inner_product
+
+    def compute_probability_wrong_TCH(self, mu_current, unc_current, mu_off, unc_off, ref_v, ideal):
+        p_wrong = integrate.quad(self.compute_inner_product,0, np.inf, args=(mu_current, unc_current, mu_off, unc_off, ref_v, ideal))[0]
+        return p_wrong
+
+    def tchebycheff(self, objective_values, weights, ideal_point, pwrong_f_samples):
+        #feval   = np.abs(objective_values - ideal_point) * weights
+        feval   = np.abs(np.transpose(pwrong_f_samples) - np.tile(ideal_point,(1000,1))) * np.tile(weights,(1000,1))
+        max_fun = np.max(feval, axis=1)
+        
         return max_fun
 
     def weighted_sum(self, objective_values, weights, pwrong_f_samples):
@@ -141,20 +154,9 @@ class ProbMOEAD_select(SelectionBase):
 
         norm_weights    = np.linalg.norm(weights)
         weights         = weights/norm_weights
-        
-        #fx_a            = objective_values - ideal_point
         fx_a            = pwrong_f_samples - ideal_point.reshape(-1,1)
-        
-        #d1              = np.inner(fx_a, weights)
-        
         d1               = np.sum(np.transpose(fx_a)* np.tile(weights,(1000,1)), axis=1)
-        
-        #fx_b            = objective_values - (ideal_point + d1 * weights)
-
         fx_b             = np.transpose(pwrong_f_samples) - (np.tile(ideal_point,(1000,1)) + np.reshape(d1,(-1,1)) * np.tile(weights,(1000,1)))
-
-        #d2              = np.linalg.norm(fx_b)
-        
         d2               = np.linalg.norm(fx_b, axis=1)
 
         fvalue          = d1 + theta * d2
@@ -164,7 +166,7 @@ class ProbMOEAD_select(SelectionBase):
 
     def _evaluate_SF(self, neighborhood, weights, ideal_point, pwrong, theta_adaptive):
         if self.SF_type == "TCH":
-            SF_values = np.array(list(map(self.tchebycheff, neighborhood, weights, ideal_point)))
+            SF_values = np.array(list(map(self.tchebycheff, neighborhood, weights, ideal_point, pwrong.f_samples)))
             return SF_values
         elif self.SF_type == "PBI":
             SF_values = np.array(list(map(self.pbi, neighborhood, weights, ideal_point, pwrong.f_samples, theta_adaptive)))

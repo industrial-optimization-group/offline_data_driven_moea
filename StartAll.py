@@ -63,9 +63,9 @@ problems = ['P1']
 
 
 #modes = [1, 7, 8]  # 1 = Gen-RVEA, 7 = Prob-RVEA 1 , 8 = Hyb-RVEA
-#modes = [12, 72, 82] # 12 = Gen-MOEA/D, 72 = Prob-MOEA/D, 82 = Hyb-MOEA/D
-
-modes = [8]
+#modes = [12, 72, 82] # 12 = Gen-MOEA/D (PBI), 72 = Prob-MOEA/D (PBI), 82 = Hyb-MOEA/D (PBI)
+modes = [723]  # 722 = Prob-MOEA/D (WS) , 723 = Prob-MOEA/D (TCH)
+#modes = [8]
 
 
 sampling = ['LHS']

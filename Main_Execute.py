@@ -18,7 +18,7 @@ from desdeo_emo.EAs.ProbRVEA import ProbRVEA_v3
 from desdeo_emo.EAs.ProbRVEA import HybRVEA
 from desdeo_emo.EAs.ProbRVEA import HybRVEA_v3
 
-from desdeo_emo.EAs.ProbMOEAD import MOEA_D, ProbMOEAD_WS
+from desdeo_emo.EAs.ProbMOEAD import MOEA_D, ProbMOEAD_TCH, ProbMOEAD_WS
 
 from desdeo_emo.EAs.ProbMOEAD import ProbMOEAD
 from desdeo_emo.EAs.ProbMOEAD import ProbMOEAD_v3
@@ -143,6 +143,17 @@ def optimize_surrogates_722(problem,x):
     #print(front_true)
     return evolver_opt.population
 
+def optimize_surrogates_723(problem,x):
+    print("Optimizing...")
+    evolver_opt = ProbMOEAD_TCH(problem, SF_type='TCH',use_surrogates=True, n_gen_per_iter=gen_per_iter_set, total_function_evaluations=max_func_evals) #, population_params={'design':'InitSamples','init_pop':x}) #, population_size=109)
+    while evolver_opt.continue_evolution():
+        evolver_opt.iterate()
+        print("FE count:",evolver_opt._function_evaluation_count)
+    #front_true = evolver_opt.population.objectives
+    #evolver_opt.population.
+    #print(front_true)
+    return evolver_opt.population
+
 def optimize_surrogates_82(problem,x):
     print("Optimizing...")
     evolver_opt = HybMOEAD_v3(problem, use_surrogates=True, n_gen_per_iter=gen_per_iter_set, total_function_evaluations=max_func_evals) #, population_params={'design':'InitSamples','init_pop':x}, population_size=109)
@@ -171,6 +182,8 @@ def run_optimizer(problem_testbench, folder_data, problem_name, nobjs, nvars, sa
         population = optimize_surrogates_72(surrogate_problem,x)
     elif approach == 722:
         population = optimize_surrogates_722(surrogate_problem,x)
+    elif approach == 723:
+        population = optimize_surrogates_723(surrogate_problem,x)
     elif approach == 82:
         population = optimize_surrogates_82(surrogate_problem,x)
     results_dict = {

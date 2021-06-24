@@ -11,6 +11,7 @@ import statsmodels.api as sm
 from statsmodels.distributions.empirical_distribution import ECDF
 from matplotlib import rc
 from datetime import datetime
+from scipy.stats import norm
 
 warnings.filterwarnings("ignore")
 
@@ -427,3 +428,23 @@ class Probability_wrong:
         return(np.sum(a_final>b_final)/(n_samples**2))
     
 
+    def get_pdf_g_tcheby(self, x, w, z, mu_f, sigma_f):
+        m=w*(mu_f-z)
+        s=w*sigma_f
+        g_m_s = (g-m)/s
+        pdf_i = norm.pdf(g_m_s)
+        cdf_i = norm.cdf(g_m_s)
+        prod_cdf_g = np.prod(cdf_i)
+        sigma_term = np.sum((pdf_i/cdf_i)/s)
+        pdf_g = sigma_term * prod_cdf_g
+        return pdf_g
+    
+    def compute_cdf_TCH(self, g, w, z, mu_f, sigma_f):
+        return integrate.quad(self.get_pdf_g_tcheby,0, g, args=(w, z, mu_f, sigma_f))
+
+    def compute_inner_product(self, x, mu_current, unc_current, mu_off, unc_off, ref_v, ideal):
+        return self.get_pdf_g_tcheby(x, ref_v, ideal, mu_current, unc_current) * self.compute_cdf_TCH(x, ref_v, ideal, mu_off, unc_off)
+
+    def compute_probability_wrong_TCH(self, mu_current, unc_current, mu_off, unc_off, ref_v, ideal):
+        p_wrong = integrate.quad(self.get_pdf_g_tcheby,0, np.inf, args=(mu_current, unc_current, mu_off, unc_off, ref_v, ideal))
+        return p_wrong
