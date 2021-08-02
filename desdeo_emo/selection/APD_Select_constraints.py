@@ -157,11 +157,13 @@ class APD_Select(SelectionBase):
         float
             The partial penalty value
         """
-        penalty = ((self.time_penalty_function()) ** self.alpha) * self.n_of_objectives
-        if penalty < 0:
-            penalty = 0
-        if penalty > 1:
-            penalty = 1
+        if self.time_penalty_function() < 0:
+            px = 0
+        elif self.time_penalty_function() > 1:
+            px = 1
+        else:
+            px= self.time_penalty_function()
+        penalty = ((px) ** self.alpha) * self.n_of_objectives
         return penalty
 
     def _calculate_fitness(self, pop) -> np.ndarray:

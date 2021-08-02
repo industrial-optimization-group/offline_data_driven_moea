@@ -23,7 +23,7 @@ class APD_Select(SelectionBase):
     """
 
     def __init__(
-        self, pop: Population, time_penalty_function: Callable, alpha: float = 2
+        self, pop: Population, time_penalty_function: Callable, alpha: float = 2, selection_type: str = None,
     ):
         self.time_penalty_function = time_penalty_function
         self.alpha = alpha
