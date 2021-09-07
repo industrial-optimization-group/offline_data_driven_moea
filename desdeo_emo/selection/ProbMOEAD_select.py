@@ -5,7 +5,7 @@ from desdeo_emo.population.Population import Population
 from desdeo_emo.othertools.ReferenceVectors import ReferenceVectors
 from desdeo_emo.othertools.ProbabilityWrong import Probability_wrong
 
-
+n_samples = 50
 class ProbMOEAD_select(SelectionBase):
     """The MOEAD selection operator. 
 
@@ -53,7 +53,6 @@ class ProbMOEAD_select(SelectionBase):
         offspring_uncertainty       = np.array([offspring_unc]*num_neighbors)
         ideal_point_matrix          = np.array([ideal_point]*num_neighbors)
         theta_adaptive_matrix       = np.array([theta_adaptive]*num_neighbors)
-        n_samples = 1000
         pwrong_current = Probability_wrong(mean_values=current_population, stddev_values=current_uncertainty, n_samples=n_samples)
         pwrong_current.vect_sample_f()
 
@@ -76,14 +75,16 @@ class ProbMOEAD_select(SelectionBase):
         #pwrong_current.plt_density(values_SF_current_temp.reshape(20,1,1000))
         probabilities = np.zeros(num_neighbors)
         for i in range(num_neighbors):
-            probabilities[i]=pwrong_current.compute_probability_wrong_PBI(pwrong_offspring, index=i)
+            # cheaper MC samples comparison
+            probabilities[i]=pwrong_current.compute_probability_wrong_MC(values_SF_current[i], values_SF_offspring[i])
+            #probabilities[i]=pwrong_current.compute_probability_wrong_PBI(pwrong_offspring, index=i)
         # Compare the offspring with the individuals in the neighborhood 
         # and replace the ones which are outperformed by it if P_{wrong}>0.5
         selection = np.where(probabilities>0.5)[0]
 
         # Considering mean
         # selection2 = np.where(np.mean(values_SF_offspring, axis=1) < np.mean(values_SF_current, axis=1))[0]
-        #print("Selection:",selection)
+        print("*****Selection:",selection)
 
         return current_neighborhood[selection]
 
@@ -107,11 +108,11 @@ class ProbMOEAD_select(SelectionBase):
         
         #d1              = np.inner(fx_a, weights)
         
-        d1               = np.sum(np.transpose(fx_a)* np.tile(weights,(1000,1)), axis=1)
+        d1               = np.sum(np.transpose(fx_a)* np.tile(weights,(n_samples,1)), axis=1)
         
         #fx_b            = objective_values - (ideal_point + d1 * weights)
 
-        fx_b             = np.transpose(pwrong_f_samples) - (np.tile(ideal_point,(1000,1)) + np.reshape(d1,(-1,1)) * np.tile(weights,(1000,1)))
+        fx_b             = np.transpose(pwrong_f_samples) - (np.tile(ideal_point,(n_samples,1)) + np.reshape(d1,(-1,1)) * np.tile(weights,(n_samples,1)))
 
         #d2              = np.linalg.norm(fx_b)
         

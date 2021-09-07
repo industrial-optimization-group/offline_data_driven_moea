@@ -423,9 +423,9 @@ class Probability_wrong:
 
     def compute_probability_wrong_MC(self, samples_A, samples_B):
         # Compute P_{wrong}(A>B)
-        a_final=np.tile(samples_A,(n_samples,1))
-        b_final=np.transpose(np.tile(samples_B,(n_samples,1)))
-        return(np.sum(a_final>b_final)/(n_samples**2))
+        a_final=np.tile(samples_A,(self.n_samples,1))
+        b_final=np.transpose(np.tile(samples_B,(self.n_samples,1)))
+        return(np.sum(a_final>b_final)/(self.n_samples**2))
     
 
     def get_pdf_g_tcheby(self, x, w, z, mu_f, sigma_f):
