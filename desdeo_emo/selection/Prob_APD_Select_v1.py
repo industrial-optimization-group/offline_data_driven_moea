@@ -113,7 +113,7 @@ class Prob_APD_select_v1(SelectionBase):
                 pwrong.pdf_list = {}
                 pwrong.ecdf_list = {}
                 pwrong.compute_pdf(apd)
-                #pwrong.plt_density(apd)
+                pwrong.plt_density(apd)
                 pwrong.compute_rank_vectorized2()
                 rank_apd = pwrong.rank_prob_wrong
                 apd_elites = apd[0,np.where(rank_apd[0,:]<0),:]
@@ -126,7 +126,7 @@ class Prob_APD_select_v1(SelectionBase):
                 if np.isnan(apd).all():
                     continue
                 selx = sub_population_index[minidx]
-                #print("Selection:",selx)
+                print("Selection:",selx)
                 #print("Selection2:",sub_population_index[minidx[0][0]])
                 if selection.shape[0] == 0:
                     selection = np.hstack((selection, np.transpose(selx[0])))

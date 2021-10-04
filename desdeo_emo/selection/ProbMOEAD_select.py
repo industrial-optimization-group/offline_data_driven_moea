@@ -5,7 +5,7 @@ from desdeo_emo.population.Population import Population
 from desdeo_emo.othertools.ReferenceVectors import ReferenceVectors
 from desdeo_emo.othertools.ProbabilityWrong import Probability_wrong
 
-n_samples = 50
+n_samples = 1000
 class ProbMOEAD_select(SelectionBase):
     """The MOEAD selection operator. 
 
@@ -71,8 +71,8 @@ class ProbMOEAD_select(SelectionBase):
         values_SF_current_temp = np.asarray([values_SF_current])
         pwrong_offspring.compute_pdf(values_SF_offspring_temp.reshape(num_neighbors,1,n_samples))
         pwrong_current.compute_pdf(values_SF_current_temp.reshape(num_neighbors,1,n_samples))
-        #pwrong_offspring.plt_density(values_SF_offspring.reshape(20,1,1000))
-        #pwrong_current.plt_density(values_SF_current_temp.reshape(20,1,1000))
+        #pwrong_offspring.plt_density(values_SF_offspring.reshape(20,1,n_samples))
+        pwrong_current.plt_density(values_SF_current_temp.reshape(20,1,n_samples))
         probabilities = np.zeros(num_neighbors)
         for i in range(num_neighbors):
             # cheaper MC samples comparison

@@ -20,7 +20,7 @@ rc('text', usetex=True)
 plt.rcParams.update({'font.size': 15})
 
 rx = np.zeros((3,2,2))
-operator = 'PBI'
+operator = 'APD'
 n_samples= 1000
 
 class Probability_wrong:
@@ -377,7 +377,7 @@ class Probability_wrong:
                 y_2 = self.ecdf_list[str(i)][j](X_plot)
                 #print(i)
                 #print(j)
-                plt.xlim(1.5,4)
+                #plt.xlim(1.5,4)
                 ax.set_xlabel(operator)
                 ax.set_ylabel('Probability density',color='r')
 
@@ -391,7 +391,7 @@ class Probability_wrong:
                 ax2=ax.twinx()
 
                 ax2.set_ylabel('Cumulative density',color='b')
-                ax.plot(X_plot, y_2, label='Empirical CDF of  '+operator,color='b')
+                ax2.plot(X_plot, y_2, label='Empirical CDF of  '+operator,color='b')
                 ax2.tick_params(axis='y', labelcolor='b')
                 #ax.legend()
                 #ax.legend(loc='lower left',bbox_to_anchor=(0,1),ncol=1, fancybox=True)
