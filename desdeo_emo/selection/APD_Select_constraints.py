@@ -4,7 +4,8 @@ from typing import List, Callable
 from desdeo_emo.selection.SelectionBase import SelectionBase
 from desdeo_emo.population.Population import Population
 from desdeo_emo.othertools.ReferenceVectors import ReferenceVectors
-
+import matplotlib.pyplot as plt
+from matplotlib import rc
 
 class APD_Select(SelectionBase):
     """
@@ -60,6 +61,27 @@ class APD_Select(SelectionBase):
         refV = vectors.neighbouring_angles_current
         # Normalization - There may be problems here
         fitness = self._calculate_fitness(pop)
+        """
+        partial_penalty_factor = 2
+
+        fitness = np.array([[1.2, 0.6],
+                            [1.23, 0.65],
+                            [0.2, 1.5],
+                            [0.2, 1.5],
+                            [0.6,1.2],
+                            [0.7, 1],
+                            [1.4, 0.1],
+                            [1.38, 0.09]])
+
+        uncertainty = np.array([[0.1, 0.2],
+                                [0.03, 0.05],
+                                [0.1, 0.1],
+                                [0.05, 0.05],
+                                [0.05,0.1],
+                                [0.1,0.05],
+                                [0.1, 0.05],
+                                [0.1, 0.05]])
+        """
         fmin = np.amin(fitness, axis=0)
         self.ideal = np.amin(
             np.vstack((self.ideal, fmin, pop.ideal_fitness_val)), axis=0
@@ -145,6 +167,8 @@ class APD_Select(SelectionBase):
                     selection = np.hstack((selection, np.transpose(selx[0])))
                 else:
                     selection = np.vstack((selection, np.transpose(selx[0])))
+        assigned_vectors = np.argmax(cosine, axis=1)
+        #plot_selection(selection, fitness, uncertainty, assigned_vectors, vectors)
         return selection.squeeze()
 
     def _partial_penalty_factor(self) -> float:
@@ -173,3 +197,47 @@ class APD_Select(SelectionBase):
             return pop.fitness - pop.uncertainity
         if self.selection_type == "robust":
             return pop.fitness + pop.uncertainity
+
+def plot_selection(selection, fitness, uncertainty, assigned_vectors, vectors):
+    rc('font',**{'family':'serif','serif':['Helvetica']})
+    rc('text', usetex=True)
+    plt.rcParams.update({'font.size': 17})
+    #plt.rcParams["text.usetex"] = True
+    vector_anno = np.arange(len(vectors.values))
+    fig = plt.figure(1, figsize=(10, 10))
+    fig.set_size_inches(4, 4)
+    ax = fig.add_subplot(111)
+    ax.set_xlabel('$f_1$')
+    ax.set_ylabel('$f_2$')
+    plt.xlim(-0.02, 1.75)
+    plt.ylim(-0.02, 1.75)
+
+    #plt.scatter(vectors.values[:, 0], vectors.values[:, 1])
+    sx= selection.squeeze()
+    #plt.scatter(translated_fitness[sx,0],translated_fitness[sx,1])
+    #plt.scatter(fitness[sx, 0], fitness[sx, 1])
+    #for i, txt in enumerate(vector_anno):
+    #    ax.annotate(vector_anno, (vectors.values[i, 0], vectors.values[i, 1]))
+
+    [plt.arrow(0, 0, dx, dy, color='magenta', length_includes_head=True,
+               head_width=0.02, head_length=0.04) for ((dx, dy)) in vectors.values]
+
+    plt.errorbar(fitness[:, 0], fitness[:, 1], xerr=1.96 * uncertainty[:, 0], yerr=1.96 * uncertainty[:, 1],fmt='*', ecolor='r', c='r')
+    for i in vector_anno:
+        ax.annotate(vector_anno[i], ((vectors.values[i, 0]+0.01), (vectors.values[i, 1]+0.01)))
+
+
+    plt.errorbar(fitness[sx,0],fitness[sx,1], xerr=1.96*uncertainty[sx, 0], yerr=1.96*uncertainty[sx, 1],fmt='o', ecolor='g',c='g')
+    #for i in range(len(assigned_vectors)):
+    #    ax.annotate(assigned_vectors[i], ((fitness[i, 0]+0.01), (fitness[i, 1]+0.01)))
+        #ax.annotate(assigned_vectors[i], ((fitness[i, 0] + 0.01), (fitness[i, 1] + 0.01)))
+    for i in range(len(assigned_vectors)):
+        if np.isin(i, sx):
+            ax.annotate(assigned_vectors[i], ((fitness[i, 0]-0.1), (fitness[i, 1]-0.1)))
+        else:
+            ax.annotate(assigned_vectors[i], ((fitness[i, 0]+0.01), (fitness[i, 1]+0.01)))
+    plt.show()
+    fig.savefig('t_select_gen.pdf',bbox_inches='tight')
+    ax.cla()
+    fig.clf()
+    print("plotted!")

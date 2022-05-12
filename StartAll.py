@@ -19,7 +19,8 @@ sample_size = 109
 #dims = 4
 ############################################
 data_folder = '/home/amrzr/Work/Codes/data'
-folder_data = '/home/amrzr/Work/Codes/data/AM_Samples_109_Final'
+#folder_data = '/home/amrzr/Work/Codes/data/AM_Samples_109_Final'
+folder_data = 'AM_Samples_109_Final'
 #folder_data = 'AM_Samples_1000'
 
 #problem_testbench = 'DTLZ'
@@ -39,7 +40,8 @@ objs(10) = PFPF;
 """
 
 #main_directory = 'Offline_Prob_DDMOPP3'
-main_directory = '/home/amrzr/Work/Codes/data/test_runs/Tests_offline_prob_main'
+#main_directory = '/home/amrzr/Work/Codes/data/test_runs/Tests_offline_prob_main'
+main_directory = '/home/amrzr/Work/Codes/data/test_runs/Test_plot'
 #main_directory = 'Tests_additional_obj1'
 #main_directory = 'Tests_Interactive_2'
 #main_directory = 'Tests_new_adapt'
@@ -47,7 +49,7 @@ main_directory = '/home/amrzr/Work/Codes/data/test_runs/Tests_offline_prob_main'
 
 #objectives = [4,6]#,5]
 #objectives = [11]
-objectives = [5]
+objectives = [2]
 #objectives = [2,3,5]
 #objectives = [2,3,4,5,6,8,10]
 #objectives = [3,5,6,8,10]
@@ -64,7 +66,7 @@ problems = ['P1']
 
 #modes = [1, 7, 8]  # 1 = Gen-RVEA, 7 = Prob-RVEA 1 , 8 = Hyb-RVEA
 #modes = [12, 72, 82] # 12 = Gen-MOEA/D (PBI), 72 = Prob-MOEA/D (PBI), 82 = Hyb-MOEA/D (PBI)
-modes = [7]  # 722 = Prob-MOEA/D (WS) , 723 = Prob-MOEA/D (TCH)
+modes = [72]  # 722 = Prob-MOEA/D (WS) , 723 = Prob-MOEA/D (TCH)
 #modes = [8]
 
 

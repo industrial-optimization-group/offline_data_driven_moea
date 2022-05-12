@@ -222,7 +222,8 @@ class RVEA(BaseDecompositionEA):
                 )
                 raise eaError(msg)
         if preference is None and not self._ref_vectors_are_focused:
-            self.reference_vectors.adapt(self.population.fitness)
+            print("adapting")
+            #self.reference_vectors.adapt(self.population.fitness)
         if preference is not None:
             ideal = self.population.ideal_fitness_val
             #fitness_vals = self.population.ob
